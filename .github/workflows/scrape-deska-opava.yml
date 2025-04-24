@@ -24,7 +24,7 @@ jobs:
         run: dotnet build
 
       - name: Run Scraper
-        run: dotnet run --project .
+        run: dotnet run --project EdeskyScraper
         
       - name: Run a multi-line script
         run: |
