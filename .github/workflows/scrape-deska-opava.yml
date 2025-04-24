@@ -2,7 +2,7 @@ name: Scrape Website
 
 on:
   schedule:
-    - cron: '*/30 * * * *'  # každou minutu
+    - cron: '*/30 */20 * * *'  # každou minutu
   workflow_dispatch:
 
 jobs:
@@ -14,17 +14,17 @@ jobs:
         
       - name: Run a one-line script
         run: echo Hello, world!
-        
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
         with:
-          node-version: '20'
+          dotnet-version: '9.0.x'
 
-      - name: Install dependencies
-        run: npm install
+      - name: Restore & Build
+        run: dotnet build
 
-      - name: Run scraper
-        run: node scraper.js 
+      - name: Run Scraper
+        run: dotnet run        
         
       - name: Run a multi-line script
         run: |
