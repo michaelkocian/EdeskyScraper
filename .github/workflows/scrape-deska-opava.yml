@@ -1,0 +1,32 @@
+name: Scrape Website
+
+on:
+  schedule:
+    - cron: '*/30 * * * *'  # každou minutu
+  workflow_dispatch:
+
+jobs:
+  run-scraper:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        
+      - name: Run a one-line script
+        run: echo Hello, world!
+        
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run scraper
+        run: node scraper.js 
+        
+      - name: Run a multi-line script
+        run: |
+          echo end.
+          echo success.
