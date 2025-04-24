@@ -2,7 +2,7 @@ name: Scrape Website
 
 on:
   schedule:
-    - cron: '*/30 */20 * * *'  # každou minutu
+    - cron: '30 20 * * *'  # at 20:30 utc
   workflow_dispatch:
 
 jobs:
