@@ -1,12 +1,11 @@
 ﻿using System.Text;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 
 Console.WriteLine("Hello, World!");
 
 // language=regex
-string pattern = @"""
-    <tr>.*?javascript:D.'(?<token>.*?)'.*?popis.>\s+(?<popis>.*?)\s+</td>.*?datod.>\s*(?<date>.*?)\s+.*?zdroj.>\s*(?<zdroj>.*?)\s*</td>.*?</tr>
-    """;
+string pattern = @"<tr>.*?javascript:D.'(?<token>.*?)'.*?popis.>\s+(?<popis>.*?)\s+</td>.*?datod.>\s*(?<date>.*?)\s+.*?zdroj.>\s*(?<zdroj>.*?)\s*</td>.*?</tr>";
 string url = "https://egov.opava-city.cz/Uredni_deska/SeznamDokumentu.aspx";
 string webhookUrl = "https://discord.com/api/webhooks/1365045974917058672/PsJhdkjYRAXzPanuNeFWqnR3MOWRhGziGTQAZWtc2iSRRGeq6jUymq63K_7mUi37QeQx";
 
@@ -16,17 +15,38 @@ string response = await http.GetStringAsync(url);
 RegexOptions options = RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.Singleline;
 MatchCollection matches = Regex.Matches(response, pattern, options);
 
-Match s = matches.FirstOrDefault();
-
-var my = s!.Groups["popis"];
-
-Console.WriteLine(my.Value);
-
-async Task SendDiscordNotification(string message)
+var entries = matches.Select(m => new
 {
-    using var http = new HttpClient();
-    var content = new StringContent($"{{\"content\":\"{EscapeForJson(message)}\"}}", Encoding.UTF8, "application/json");
-    await http.PostAsync(webhookUrl, content);
+    Token = m.Groups["token"].Value,
+    Popis = m.Groups["popis"].Value,
+    Date = m.Groups["date"].Value,
+    Zdroj = m.Groups["zdroj"].Value,
+}).Where(a => a.Date == DateTime.UtcNow.ToString("d.M.yyyy"));
+
+
+foreach (var e in entries)
+{
+    Console.WriteLine(JsonSerializer.Serialize(e));
+    string message = e.Popis.Replace('"', '\'');
+
+    var payload = new
+    {
+        title = "Nový záznam",
+        content = message,
+        embeds = new List<object>(){new
+        {
+            author = new {
+                name = e.Zdroj,
+            },
+            title = "Odkaz na www",
+            description = message,
+            color = 1127128,
+            url = $"https://egov.opava-city.cz/Uredni_deska/DetailDokument.aspx?IdFile={e.Token}&Por=0",
+        } }
+    };
+
+    var content = new StringContent(JsonSerializer.Serialize(payload), Encoding.UTF8, "application/json");
+    var discordresponse = await http.PostAsync(webhookUrl, content);
+    var textresponse = await discordresponse.Content.ReadAsStringAsync();
+    await Task.Delay(1000);
 }
-static string EscapeForJson(string s) =>
-    s.Replace("\\", "\\\\").Replace("\"", "\\\"").Replace("\n", "\\n").Replace("\r", "");
