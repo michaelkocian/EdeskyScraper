@@ -37,8 +37,8 @@ foreach (var e in selectedEntries)
 
     var payload = new
     {
-        title = e.Date,
-        content = e.Date,
+        title = $"{e.Category} / {e.Source}",
+        content = $"{e.Category} / {e.Source}",
         embeds = new List<object>(){new
         {
             author = new {
