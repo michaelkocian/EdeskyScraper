@@ -24,13 +24,8 @@ jobs:
           
       - name: create file
         run: |
-          echo "Hello from GitHub Actions!" >> hello.txt
-      
-      - name: Commit and push
-        run: |
-          git add .
-          git commit -m "Automated commit from GitHub Actions" || echo "Nothing to commit"
-          git push
+          pwd
+          ls
           
       - name: Setup .NET
         uses: actions/setup-dotnet@v3
@@ -42,8 +37,11 @@ jobs:
 
       - name: Run Scraper
         run: dotnet run --project EdeskyScraper
-        
-      - name: Run a multi-line script
+
+      - name: Commit and push
         run: |
-          echo end.
+          git add .
+          git commit -m "Automated commit from GitHub Actions" || echo "Nothing to commit"
+          git push
           echo success.
+          
