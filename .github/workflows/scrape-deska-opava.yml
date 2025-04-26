@@ -11,10 +11,29 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        
-      - name: Run a one-line script
-        run: echo Hello, world!
-
+        with:
+          persist-credentials: true
+      - name: s
+        uses: actions/checkout@v4
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+      
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          
+      - name: create file
+        run: |
+          echo "Hello from GitHub Actions!" >> hello.txt
+      
+      - name: Commit and push
+        run: |
+          git add .
+          git commit -m "Automated commit from GitHub Actions" || echo "Nothing to commit"
+          git push
+          
       - name: Setup .NET
         uses: actions/setup-dotnet@v3
         with:
