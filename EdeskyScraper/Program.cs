@@ -19,6 +19,8 @@ RegexOptions options = RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexO
 
 string[] lastRunTokens = File.Exists(filepath) ? await File.ReadAllLinesAsync(filepath) : [];
 
+Console.WriteLine($"found {lastRunTokens.Length} token from last run.");
+
 using var http = new HttpClient();
 string overviewContent = await http.GetStringAsync(url);
 if (string.IsNullOrWhiteSpace(overviewContent))
