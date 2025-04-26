@@ -17,7 +17,7 @@ string url = "https://egov.opava-city.cz/Uredni_deska/SeznamDokumentu.aspx";
 string webhookUrl = "https://discord.com/api/webhooks/1365045974917058672/PsJhdkjYRAXzPanuNeFWqnR3MOWRhGziGTQAZWtc2iSRRGeq6jUymq63K_7mUi37QeQx";
 RegexOptions options = RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.Singleline;
 
-string[] lastRunTokens = await File.ReadAllLinesAsync(filepath);
+string[] lastRunTokens = File.Exists(filepath) ? await File.ReadAllLinesAsync(filepath) : [];
 
 using var http = new HttpClient();
 string overviewContent = await http.GetStringAsync(url);
