@@ -48,14 +48,14 @@ foreach (var e in selectedEntries)
 
 foreach (var e in selectedEntries)
 {
-    Console.WriteLine(JsonSerializer.Serialize(e));
+    Console.WriteLine($"SENDING: {e.Token}");
     var payload = new
     {
-        username = e.Source, 
+        username = e.Source,
         title = $"{e.Source} \n {e.Category}",
         //content = $"{e.Source} \n{e.Description}",
         embeds = new List<object>(){new
-        { 
+        {
             author = new {
                 name = e.Title,
             },
@@ -99,11 +99,11 @@ foreach (var e in selectedEntries)
     };
     var content = new StringContent(JsonSerializer.Serialize(payload), Encoding.UTF8, "application/json");
     var discordresponse = await http.PostAsync(webhookUrl, content);
+    var textresponse = await discordresponse.Content.ReadAsStringAsync();
     if (!discordresponse.IsSuccessStatusCode)
     {
-        throw new Exception("discord declined the message");
+        throw new Exception("discord declined the message: " + textresponse);
     }
-    var textresponse = await discordresponse.Content.ReadAsStringAsync();
     await Task.Delay(1000);
 }
 
