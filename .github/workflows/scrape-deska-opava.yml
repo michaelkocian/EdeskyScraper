@@ -2,7 +2,7 @@ name: Scrape Website
 
 on:
   schedule:
-    - cron: '30 20 * * *'  # at 20:30 utc
+    - cron: '15 8,12,16,20 * * *'
   workflow_dispatch:
 
 permissions:
@@ -21,11 +21,6 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          
-      - name: create file
-        run: |
-          pwd
-          ls
           
       - name: Setup .NET
         uses: actions/setup-dotnet@v3

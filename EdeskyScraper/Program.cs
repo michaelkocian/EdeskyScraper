@@ -51,10 +51,11 @@ foreach (var e in selectedEntries)
     Console.WriteLine(JsonSerializer.Serialize(e));
     var payload = new
     {
-        title = $"{e.Category} / {e.Source}",
-        content = $"{e.Category} / {e.Source}",
+        username = e.Source, 
+        title = $"{e.Source} \n {e.Category}",
+        //content = $"{e.Source} \n{e.Description}",
         embeds = new List<object>(){new
-        {
+        { 
             author = new {
                 name = e.Title,
             },
@@ -82,6 +83,11 @@ foreach (var e in selectedEntries)
                 new {
                     name = "Note",
                     value = e.Detail?.Note ?? "",
+                    inline = true,
+                },
+                new {
+                    name = "Number",
+                    value = e.Detail?.Number ?? "",
                     inline = true,
                 },
             }.Concat(e.Attachments.Select(a => new {
