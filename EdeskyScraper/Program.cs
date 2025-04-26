@@ -55,14 +55,14 @@ foreach (var e in selectedEntries)
 
     e.Detail = new DetailModel
     {
-        Agenda = detailDictionary.GetValueOrDefault("agenda").Replace('"', '\''),
-        Title = detailDictionary.GetValueOrDefault("nazev").Replace('"', '\''),
-        Number = detailDictionary.GetValueOrDefault("cj").Replace('"', '\''),
-        DateFrom = detailDictionary.GetValueOrDefault("zverejneno_od").Replace('"', '\''),
-        DateTo = detailDictionary.GetValueOrDefault("zverejneno_do").Replace('"', '\''),
-        Description = detailDictionary.GetValueOrDefault("anotace").Replace('"', '\''),
-        Note = detailDictionary.GetValueOrDefault("poznamka").Replace('"', '\''),
-        Source = detailDictionary.GetValueOrDefault("zdroj").Replace('"', '\''),
+        Agenda = detailDictionary.GetValueOrDefault("agenda")?.Replace('"', '\'') ?? string.Empty,
+        Title = detailDictionary.GetValueOrDefault("nazev")?.Replace('"', '\'') ?? string.Empty,
+        Number = detailDictionary.GetValueOrDefault("cj")?.Replace('"', '\'') ?? string.Empty,
+        DateFrom = detailDictionary.GetValueOrDefault("zverejneno_od")?.Replace('"', '\'') ?? string.Empty,
+        DateTo = detailDictionary.GetValueOrDefault("zverejneno_do")?.Replace('"', '\'') ?? string.Empty,
+        Description = detailDictionary.GetValueOrDefault("anotace")?.Replace('"', '\'') ?? string.Empty,
+        Note = detailDictionary.GetValueOrDefault("poznamka")?.Replace('"', '\'') ?? string.Empty,
+        Source = detailDictionary.GetValueOrDefault("zdroj")?.Replace('"', '\'') ?? string.Empty,
     };
 
 
@@ -90,19 +90,19 @@ foreach (var e in selectedEntries)
                 name = e.Title,
             },
             title = e.Category,
-            description = e.Detail.Description,
+            description = e.Detail?.Description ?? "",
             color = 1127128,
             url = e.Url,
             fields = new List<object>()
             {
                 new {
                     name = "Date From",
-                    value = e.Detail.DateFrom,
+                    value = e.Detail?.DateFrom ?? "",
                     inline = true,
                 },
                 new {
                     name = "Date To",
-                    value = e.Detail.DateTo,
+                    value = e.Detail?.DateTo ?? "",
                     inline = true,
                 },
                 new {
@@ -112,7 +112,7 @@ foreach (var e in selectedEntries)
                 },
                 new {
                     name = "Note",
-                    value = e.Detail.Note,
+                    value = e.Detail?.Note ?? "",
                     inline = true,
                 },
             }.Concat(e.Attachments.Select(a => new {
@@ -148,34 +148,34 @@ Console.WriteLine("App finished successfully.");
 
 public class OverviewModel
 {
-    public string Token { get; set; }
-    public string Category { get; set; }
-    public string Date { get; set; }
-    public string Title { get; set; }
-    public string Description { get; set; }
-    public string Source { get; set; }
+    public required string Token { get; set; }
+    public required string Category { get; set; }
+    public required string Date { get; set; }
+    public required string Title { get; set; }
+    public required string Description { get; set; }
+    public required string Source { get; set; }
     public string Url => $"https://egov.opava-city.cz/Uredni_deska/DetailDokument.aspx?IdFile={Token}&Por=0";
-    public DetailModel Detail { get; set; }
+    public DetailModel? Detail { get; set; }
     public AttachmentModel[] Attachments { get; set; } = [];
 }
 
 public class DetailModel
 {
-    public string Agenda { get; set; }
-    public string Title { get; set; }
-    public string Number { get; set; }
-    public string DateFrom { get; set; }
-    public string DateTo { get; set; }
-    public string Description { get; set; }
-    public string Note { get; set; }
-    public string Source { get; set; }
+    public required string Agenda { get; set; }
+    public required string Title { get; set; }
+    public required string Number { get; set; }
+    public required string DateFrom { get; set; }
+    public required string DateTo { get; set; }
+    public required string Description { get; set; }
+    public required string Note { get; set; }
+    public required string Source { get; set; }
 }
 
 public class AttachmentModel
 {
     public string Url => $"https://egov.opava-city.cz/Uredni_deska/{UrlPathAndQuery}";
-    public string UrlPathAndQuery { get; set; }
-    public string Size { get; set; }
-    public string Name { get; set; }
-    public string Note { get; set; }
+    public required string UrlPathAndQuery { get; set; }
+    public required string Size { get; set; }
+    public required string Name { get; set; }
+    public required string Note { get; set; }
 }
