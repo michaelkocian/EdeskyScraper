@@ -1,4 +1,6 @@
-﻿using System.Text;
+﻿using EdeskyScraper;
+using EdeskyScraper.Models;
+using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 
@@ -10,9 +12,12 @@ string patternOverviewRegex = @"<tr>.*?kategorie.>\s*(?<category>.*?)\s*<.*?java
 string patternDetailRegex = @"parid=.(?<key>\w+).>(?<value>.*?)<";
 // language=regex
 string attachmentRegex = @"href=.(?<url>Dokument.*?).>(?<name>.*?)<.*?velikost.>.(?<size>.*?).<.*?soubor_poznamka_div.>(?<note>.*?)<";
-
+string filepath = "lastrun.txt";
 string url = "https://egov.opava-city.cz/Uredni_deska/SeznamDokumentu.aspx";
 string webhookUrl = "https://discord.com/api/webhooks/1365045974917058672/PsJhdkjYRAXzPanuNeFWqnR3MOWRhGziGTQAZWtc2iSRRGeq6jUymq63K_7mUi37QeQx";
+RegexOptions options = RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.Singleline;
+
+string[] lastRunTokens = await File.ReadAllLinesAsync(filepath);
 
 using var http = new HttpClient();
 string overviewContent = await http.GetStringAsync(url);
@@ -21,19 +26,9 @@ if (string.IsNullOrWhiteSpace(overviewContent))
     throw new Exception("unable to download webpage");
 }
 
-RegexOptions options = RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.Singleline;
 MatchCollection overviewMatches = Regex.Matches(overviewContent, patternOverviewRegex, options);
-
-var entries = overviewMatches.Select(m => new OverviewModel()
-{
-    Token = m.Groups["token"].Value.Replace('"', '\''),
-    Category = m.Groups["category"].Value.Replace('"', '\''),
-    Date = m.Groups["date"].Value.Replace('"', '\''),
-    Title = m.Groups["title"].Value.Replace('"', '\''),
-    Description = m.Groups["desc"].Value.Replace('"', '\''),
-    Source = m.Groups["source"].Value.Replace('"', '\''),
-}).ToArray();
-var selectedEntries = entries.Where(a => a.Date == DateTime.UtcNow.AddDays(-1).ToString("d.M.yyyy")).ToArray();
+OverviewModel[] entries = overviewMatches.GenerateEntries();
+OverviewModel[] selectedEntries = entries.Where(e => !lastRunTokens.Contains(e.Token)).ToArray();
 
 //debug disable
 selectedEntries = [];
@@ -45,36 +40,11 @@ foreach (var e in selectedEntries)
     {
         throw new Exception("unable to download detail page");
     }
+    MatchCollection detailMatches = Regex.Matches(detailPageContent, patternDetailRegex, options);
+    e.Detail = detailMatches.GenerateDetail();
 
-    Dictionary<string, string> detailDictionary = Regex.Matches(detailPageContent, patternDetailRegex, options)
-    .Cast<Match>()
-    .ToDictionary(
-        m => m.Groups[1].Value.Replace('"', '\''),
-        m => m.Groups[2].Value.Replace('"', '\'')
-    );
-
-    e.Detail = new DetailModel
-    {
-        Agenda = detailDictionary.GetValueOrDefault("agenda")?.Replace('"', '\'') ?? string.Empty,
-        Title = detailDictionary.GetValueOrDefault("nazev")?.Replace('"', '\'') ?? string.Empty,
-        Number = detailDictionary.GetValueOrDefault("cj")?.Replace('"', '\'') ?? string.Empty,
-        DateFrom = detailDictionary.GetValueOrDefault("zverejneno_od")?.Replace('"', '\'') ?? string.Empty,
-        DateTo = detailDictionary.GetValueOrDefault("zverejneno_do")?.Replace('"', '\'') ?? string.Empty,
-        Description = detailDictionary.GetValueOrDefault("anotace")?.Replace('"', '\'') ?? string.Empty,
-        Note = detailDictionary.GetValueOrDefault("poznamka")?.Replace('"', '\'') ?? string.Empty,
-        Source = detailDictionary.GetValueOrDefault("zdroj")?.Replace('"', '\'') ?? string.Empty,
-    };
-
-
-    e.Attachments = Regex.Matches(detailPageContent, attachmentRegex, options)
-    .Cast<Match>()
-    .Select(m => new AttachmentModel()
-    {
-        UrlPathAndQuery = m.Groups["url"].Value,
-        Name = m.Groups["name"].Value,
-        Size = m.Groups["size"].Value,
-        Note = m.Groups["note"].Value,
-    }).ToArray();
+    MatchCollection attachmentMatches = Regex.Matches(detailPageContent, attachmentRegex, options);
+    e.Attachments = attachmentMatches.GenerateAttachments();
 }
 
 foreach (var e in selectedEntries)
@@ -142,40 +112,6 @@ if (expectedCount != actualCount)
     throw new Exception($"Some messages was not extracted. actualCount: {actualCount}, expectedCount: {expectedCount}");
 }
 
-File.WriteAllLines("lastrun.txt", entries.Select(e => e.Token));
+File.WriteAllLines(filepath, entries.Select(e => e.Token));
 
 Console.WriteLine("App finished successfully.");
-
-public class OverviewModel
-{
-    public required string Token { get; set; }
-    public required string Category { get; set; }
-    public required string Date { get; set; }
-    public required string Title { get; set; }
-    public required string Description { get; set; }
-    public required string Source { get; set; }
-    public string Url => $"https://egov.opava-city.cz/Uredni_deska/DetailDokument.aspx?IdFile={Token}&Por=0";
-    public DetailModel? Detail { get; set; }
-    public AttachmentModel[] Attachments { get; set; } = [];
-}
-
-public class DetailModel
-{
-    public required string Agenda { get; set; }
-    public required string Title { get; set; }
-    public required string Number { get; set; }
-    public required string DateFrom { get; set; }
-    public required string DateTo { get; set; }
-    public required string Description { get; set; }
-    public required string Note { get; set; }
-    public required string Source { get; set; }
-}
-
-public class AttachmentModel
-{
-    public string Url => $"https://egov.opava-city.cz/Uredni_deska/{UrlPathAndQuery}";
-    public required string UrlPathAndQuery { get; set; }
-    public required string Size { get; set; }
-    public required string Name { get; set; }
-    public required string Note { get; set; }
-}
