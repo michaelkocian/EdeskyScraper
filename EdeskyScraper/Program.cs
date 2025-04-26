@@ -32,9 +32,6 @@ MatchCollection overviewMatches = Regex.Matches(overviewContent, patternOverview
 OverviewModel[] entries = overviewMatches.GenerateEntries();
 OverviewModel[] selectedEntries = entries.Where(e => !lastRunTokens.Contains(e.Token)).ToArray();
 
-//debug disable
-selectedEntries = [];
-
 foreach (var e in selectedEntries)
 {
     string detailPageContent = await http.GetStringAsync(e.Url);
