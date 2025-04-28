@@ -46,6 +46,7 @@ foreach (var e in selectedEntries)
     e.Attachments = attachmentMatches.GenerateAttachments();
 }
 
+int messageColor = Colors.GetTimeBasedColor(DateTime.UtcNow);
 foreach (var e in selectedEntries)
 {
     Console.WriteLine($"SENDING: {e.Token}");
@@ -61,7 +62,7 @@ foreach (var e in selectedEntries)
             },
             title = e.Category,
             description = e.Detail?.Description ?? "",
-            color = 1127128,
+            color = messageColor,
             url = e.Url,
             fields = new List<object>()
             {
