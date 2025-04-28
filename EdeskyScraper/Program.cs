@@ -34,7 +34,7 @@ if (string.IsNullOrWhiteSpace(overviewContent))
 
 MatchCollection overviewMatches = Regex.Matches(overviewContent, patternOverviewRegex, options);
 OverviewModel[] entries = overviewMatches.GenerateEntries();
-OverviewModel[] selectedEntries = entries.Where(e => !lastRunTokens.Contains(e.Token)).ToArray();
+OverviewModel[] selectedEntries = entries.Where(e => !lastRunTokens.Contains(e.Token)).Reverse().ToArray();
 
 foreach (var e in selectedEntries)
 {
