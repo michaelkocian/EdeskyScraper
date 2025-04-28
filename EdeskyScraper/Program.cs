@@ -6,9 +6,9 @@ using System.Text.Json;
 using System.Text.RegularExpressions;
 
 Console.WriteLine("App starting");
-IConfigurationBuilder builder = new ConfigurationBuilder().AddUserSecrets<Program>();
+IConfigurationBuilder builder = new ConfigurationBuilder().AddEnvironmentVariables().AddUserSecrets<Program>();
 IConfigurationRoot configuration = builder.Build();
-string webhookUrl = configuration["DISCORD_WEBHOOK_URL"];
+string webhookUrl = configuration["DISCORD_WEBHOOK_URL"] ?? throw new Exception("discord webhook not passed into app.");
 
 
 // language=regex
