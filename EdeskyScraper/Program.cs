@@ -1,10 +1,15 @@
 ﻿using EdeskyScraper;
 using EdeskyScraper.Models;
+using Microsoft.Extensions.Configuration;
 using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 
 Console.WriteLine("App starting");
+IConfigurationBuilder builder = new ConfigurationBuilder().AddUserSecrets<Program>();
+IConfigurationRoot configuration = builder.Build();
+string webhookUrl = configuration["DISCORD_WEBHOOK_URL"];
+
 
 // language=regex
 string patternOverviewRegex = @"<tr>.*?kategorie.>\s*(?<category>.*?)\s*<.*?javascript:D.'(?<token>.*?)', '0'.;.>(?<title>.*?)</a>.*?popis.>\s*(?<desc>.*?)\s*<.*?datod.>\s*(?<date>.*?)\s*<.*?zdroj.>\s*(?<source>.*?)\s*<.*?</tr>";
@@ -14,7 +19,6 @@ string patternDetailRegex = @"parid=.(?<key>\w+).>(?<value>.*?)<";
 string attachmentRegex = @"href=.(?<url>Dokument.*?).>(?<name>.*?)<.*?velikost.>.(?<size>.*?).<.*?soubor_poznamka_div.>(?<note>.*?)<";
 string filepath = "lastrun.txt";
 string url = "https://egov.opava-city.cz/Uredni_deska/SeznamDokumentu.aspx";
-string webhookUrl = "https://discord.com/api/webhooks/1365045974917058672/PsJhdkjYRAXzPanuNeFWqnR3MOWRhGziGTQAZWtc2iSRRGeq6jUymq63K_7mUi37QeQx";
 RegexOptions options = RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.Singleline;
 
 string[] lastRunTokens = File.Exists(filepath) ? await File.ReadAllLinesAsync(filepath) : [];
