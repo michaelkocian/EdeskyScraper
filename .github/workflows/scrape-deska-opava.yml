@@ -2,7 +2,8 @@ name: Scrape Website
 
 on:
   schedule:
-    - cron: '15 8,12,16,20 * * *'
+    - cron: '15 6,8,10,12,14,16,20 * * 1,2,3,4,5'
+    - cron: '15 12,20 * * 0,6'
   workflow_dispatch:
 
 permissions:
