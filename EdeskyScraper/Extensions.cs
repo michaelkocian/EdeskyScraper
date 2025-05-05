@@ -9,6 +9,7 @@ public static class Extensions
         return matches.Select(m => new OverviewModel()
         {
             Token = m.Groups["token"].Value.Replace('"', '\''),
+            Number = m.Groups["number"].Value.Replace('"', '\''),
             Category = m.Groups["category"].Value.Replace('"', '\''),
             Date = m.Groups["date"].Value.Replace('"', '\''),
             Title = m.Groups["title"].Value.Replace('"', '\''),

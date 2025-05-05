@@ -12,7 +12,7 @@ string webhookUrl = configuration["DISCORD_WEBHOOK_URL"] ?? throw new Exception(
 
 
 // language=regex
-string patternOverviewRegex = @"<tr>.*?kategorie.>\s*(?<category>.*?)\s*<.*?javascript:D.'(?<token>.*?)', '0'.;.>(?<title>.*?)</a>.*?popis.>\s*(?<desc>.*?)\s*<.*?datod.>\s*(?<date>.*?)\s*<.*?zdroj.>\s*(?<source>.*?)\s*<.*?</tr>";
+string patternOverviewRegex = @"<tr>.*?kategorie.>\s*(?<category>.*?)\s*<.*?javascript:D.'(?<token>.*?)', '(?<number>\d+)'.;.>(?<title>.*?)</a>.*?popis.>\s*(?<desc>.*?)\s*<.*?datod.>\s*(?<date>.*?)\s*<.*?zdroj.>\s*(?<source>.*?)\s*<.*?</tr>";
 // language=regex
 string patternDetailRegex = @"parid=.(?<key>\w+).>(?<value>.*?)<";
 // language=regex
