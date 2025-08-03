@@ -5,6 +5,31 @@ using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 
+
+string[] ignored = [
+    "přerušení dodávky elektrické energie",
+    "možnost převzít písemnost",
+    "Jamnice",
+    "Háj ve Slezsku",
+    "Sosnová",
+    "Neplachovice",
+    "Velké Heraltice",
+    "Branka u Opavy",
+    "Litultovice",
+    "Jezdkovice",
+    "Hněvošice",
+    "Hrabyně",
+    "Dolní Životice",
+    "Loděnice",
+    "Služovice",
+    "Chlebičov",
+    "Uhlířov",
+    "Hradec nad Moravicí",
+    "Jakartovice",
+    "Stěbořice",
+    "Mikolajice",
+    ];
+
 Console.WriteLine("App starting");
 IConfigurationBuilder builder = new ConfigurationBuilder().AddEnvironmentVariables().AddUserSecrets<Program>();
 IConfigurationRoot configuration = builder.Build();
@@ -53,6 +78,12 @@ foreach (var e in selectedEntries)
 int messageColor = Colors.GetTimeBasedColor(DateTime.UtcNow);
 foreach (var e in selectedEntries)
 {
+    if (e.Detail?.Description?.Contains("Opav") == false 
+        && ignored.Any(ign => e.Detail?.Description?.Contains(ign) == true))
+    {
+        continue;
+    }
+
     Console.WriteLine($"SENDING: {e.Token}");
     var payload = new
     {
