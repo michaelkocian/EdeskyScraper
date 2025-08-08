@@ -28,6 +28,9 @@ string[] ignored = [
     "Jakartovice",
     "Stěbořice",
     "Mikolajice",
+    "Brumovice",
+    "Oldřišov",
+    "Bílčice",
     ];
 
 Console.WriteLine("App starting");
