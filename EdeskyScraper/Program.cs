@@ -133,7 +133,7 @@ foreach (var e in selectedEntries)
                 name = a.Note,
                 value = $"[{a.Name}]({a.Url}) ({a.Size})",
                 inline = true,
-            }))
+            })).Take(25)
         } }
     };
     var content = new StringContent(JsonSerializer.Serialize(payload), Encoding.UTF8, "application/json");
